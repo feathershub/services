@@ -78,3 +78,18 @@ func (club *Club) Get(id int) error {
 	}
 	return nil
 }
+
+// Update an existing club
+func (club *Club) Update(id int) error {
+
+	err := db.Model(&club).Where("id=?", id).Updates(&club).Error
+
+	if err != nil {
+		logrus.Errorf("Failed to update clun with id %d and values %+v ", id, club)
+		return err
+	}
+
+	return nil
+}
+
+// Delete an exising club
