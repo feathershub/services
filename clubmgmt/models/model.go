@@ -25,5 +25,11 @@ func init() {
 		logrus.Errorln("Failed to open databsae connection ", err)
 	}
 	db = sess
+}
 
+// MigrateDB migrate all models
+func MigrateDB() {
+	db.AutoMigrate(&Club{})
+	db.AutoMigrate(&Venue{})
+	db.AutoMigrate(&Court{})
 }

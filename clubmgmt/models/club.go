@@ -32,6 +32,9 @@ type (
 		City       string `gorm:"not null;" json:"city"`
 		Country    string `gorm:"not null;" json:"country"`
 		Zipcode    string `gorm:"not null;index" json:"zipcode"`
+		// Communication details
+		Phone string `gorm:"not null;index" json:"phone"`
+		Email string `gorm:"not null;index" json:"email"`
 		// ClubID
 		ClubID uint `gorm:"" json:"club_id"`
 		// Courts
@@ -54,12 +57,23 @@ type (
 // Create a new Club
 func (club *Club) Create() error {
 	if len(club.Venues) == 0 {
-		logrus.Errorln("No venues found in the club ", &club)
+		logrus.Errorf("No venues found in the club %+v\n", club)
 		return errors.New("No venues found in the club ")
 	}
 	err := db.Create(&club).Error
 	if err != nil {
-		logrus.Errorln("Failed to create new club with values ", &club)
+		logrus.Errorln("Failed to create new club with values %+v\n", club)
+		return err
+	}
+	return nil
+}
+
+// Get a club with id
+func (club *Club) Get(id int) error {
+
+	err := db.Model(&club).Where("id=?", id).First(&club).Error
+	if err != nil {
+		logrus.Errorf("Unable to find the club with id  %d ", id)
 		return err
 	}
 	return nil
