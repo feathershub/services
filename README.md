@@ -1,1 +1,1 @@
-# services - all backend services for feathershub
+# FeathersHub Backend services
