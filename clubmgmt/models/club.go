@@ -93,3 +93,46 @@ func (club *Club) Update(id int) error {
 }
 
 // Delete an exising club
+func (club *Club) Delete(id int) error {
+	// transaction
+	tx := db.Begin()
+
+	// step1 : query the club and load it
+	tx.Model(&club).Where("id=?", id).Preload("Venues").First(&club)
+	if tx.Error != nil {
+		err := tx.Error
+		logrus.Errorf("Failed to find club with id %d for deletion", id)
+		tx.Rollback()
+		return err
+	}
+	// step2: update the club
+	tx.Model(&club).Where("id=?", id).Update("Status", false)
+	if tx.Error != nil {
+		err := tx.Error
+		logrus.Errorf("Failed to deactivate club with id %d ", id)
+		tx.Rollback()
+		return err
+	}
+	// step3: update all venues
+	tx.Model(&Venue{}).Where("club_id=?", id).Update("Status", false)
+	if tx.Error != nil {
+		err := tx.Error
+		logrus.Errorf("Failed to deactivate club with id %d ", id)
+		tx.Rollback()
+		return err
+	}
+	// step4: iterate to find the venues
+	for _, venue := range club.Venues {
+		tx.Model(&Court{}).Where("venue_id=?", venue.ID).Update("Status", false)
+		if tx.Error != nil {
+			err := tx.Error
+			logrus.Errorf("Failed to deactivate club with id %d ", id)
+			tx.Rollback()
+			return err
+		}
+	}
+	// step5 : commit
+	tx.Commit()
+
+	return nil
+}

@@ -69,5 +69,30 @@ func TestGetClub(t *testing.T) {
 }
 
 func TestUpdateClub(t *testing.T) {
+	setupDB()
+	err := tmpClub.Create()
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	tmpClub.DisplayName = "cool"
+	err = tmpClub.Update(int(tmpClub.ID))
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	tearDownDB()
+}
 
+func TestDeleteClub(t *testing.T) {
+	setupDB()
+	tmpClub.Create()
+
+	err := tmpClub.Delete(int(tmpClub.ID))
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	tearDownDB()
 }
