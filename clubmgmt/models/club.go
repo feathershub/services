@@ -1,6 +1,9 @@
 package models
 
 import (
+	"errors"
+
+	"github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 )
 
@@ -45,3 +48,19 @@ type (
 		Status bool `gorm:"default true;index" json:"status"`
 	}
 )
+
+// all crud operations on club
+
+// Create a new Club
+func (club *Club) Create() error {
+	if len(club.Venues) == 0 {
+		logrus.Errorln("No venues found in the club ", &club)
+		return errors.New("No venues found in the club ")
+	}
+	err := db.Create(&club).Error
+	if err != nil {
+		logrus.Errorln("Failed to create new club with values ", &club)
+		return err
+	}
+	return nil
+}
