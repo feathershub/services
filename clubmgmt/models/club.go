@@ -71,7 +71,7 @@ func (club *Club) Create() error {
 // Get a club with id
 func (club *Club) Get(id int) error {
 
-	err := db.Model(&club).Where("id=?", id).First(&club).Error
+	err := db.Model(&club).Where("id=?", id).Preload("Venues").First(&club).Error
 	if err != nil {
 		logrus.Errorf("Unable to find the club with id  %d ", id)
 		return err
